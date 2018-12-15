@@ -26,9 +26,9 @@ export const login = LoginRequest => async dispatch => {
     // extract token from res.data
     const token = { token: res.headers["authorization"]};
     // store the token in the localStorage
-    localStorage.setItem("jwtToken", token);
+    localStorage.setItem("jwtToken", token.token);
     // set our token in header ***
-    setJWTToken(token);
+    setJWTToken(token.token);
     // decode token on React
     const decoded = jwt_decode(token.token);
 
