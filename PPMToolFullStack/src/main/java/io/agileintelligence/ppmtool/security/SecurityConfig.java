@@ -68,21 +68,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
 	{
 		http.cors().and().csrf().disable() // these two are about attacks (cross-site and cross-origin resourse sharing
 											// as we are using jwt and it will prevent both)
-				.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and() // show a custom error message
-																							// instead of a default 401
-																							// response when login is not successful.
-				                                                                            // For example, when trying to login with
-																							// bad username
-				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // do not save sessions or
-																							// cookies. All done with
-																							// tokens
-				.and().headers().frameOptions().sameOrigin() // To enable H2 Database
-				.and().authorizeRequests()
-				.antMatchers("/", "/favicon.ico", "/**/*.png", "/**/*.gif", "/**/*.svg", "/**/*.jpg", "/**/*.html",
-						"/**/*.css", "/**/*.js")
-				.permitAll() // permit all of these requests. Do not use security for clients like Thymeleaf,
-								// Spring MVC, JSP, etc.
-				.antMatchers(SIGN_UP_URLS).permitAll() // allow new users to register or see the login screen
+		
+		// show a custom error message instead of a default 401 response when login is not successful. For example, when trying to login with
+		// bad username
+		.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and() 
+		// do not save sessions or cookies. All done with tokens
+		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+		// To enable H2 Database
+		.and().headers().frameOptions().sameOrigin() 
+		.and().authorizeRequests()
+		.antMatchers("/", "/favicon.ico", "/**/*.png", "/**/*.gif", "/**/*.svg", "/**/*.jpg", "/**/*.html",
+				"/**/*.css", "/**/*.js")
+		// permit all of these requests. Do not use security for clients like Thymeleaf, Spring MVC, JSP, etc.		
+		.permitAll() 
+		.antMatchers(SIGN_UP_URLS).permitAll() // allow new users to register or see the login screen
 				.antMatchers(H2_URL).permitAll()
 				.anyRequest().authenticated(); // anything other than above needs
 																				// authentication
