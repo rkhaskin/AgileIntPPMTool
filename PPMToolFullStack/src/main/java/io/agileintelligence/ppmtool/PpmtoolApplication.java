@@ -6,14 +6,20 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @SpringBootApplication
-public class PpmtoolApplication {
+public class PpmtoolApplication
+{
 
-    @Bean
-    BCryptPasswordEncoder bCryptPasswordEncoder(){
-        return new BCryptPasswordEncoder();
-    }
+	/*
+	 * create a bean, so it could be autowired in UserService
+	 */
+	@Bean
+	BCryptPasswordEncoder bCryptPasswordEncoder()
+	{
+		return new BCryptPasswordEncoder();
+	}
 
-    public static void main(String[] args) {
-        SpringApplication.run(PpmtoolApplication.class, args);
-    }
+	public static void main(String[] args)
+	{
+		SpringApplication.run(PpmtoolApplication.class, args);
+	}
 }

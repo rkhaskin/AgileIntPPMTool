@@ -10,24 +10,32 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class CustomUserDetailsService implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService
+{
 
-    @Autowired
-    private UserRepository userRepository;
+	@Autowired
+	private UserRepository userRepository;
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
-        if(user==null) new UsernameNotFoundException("User not found");
-        return user;
-    }
+	/*
+	 * returns UseerDetails, which is implemented by the User class. Used by
+	 * authentication manager builder
+	 */
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
+	{
+		User user = userRepository.findByUsername(username);
+		if (user == null)
+			new UsernameNotFoundException("User not found");
+		return user;
+	}
 
+	@Transactional
+	public User loadUserById(Long id)
+	{
+		User user = userRepository.getById(id);
+		if (user == null)
+			new UsernameNotFoundException("User not found");
+		return user;
 
-    @Transactional
-    public User loadUserById(Long id){
-        User user = userRepository.getById(id);
-        if(user==null) new UsernameNotFoundException("User not found");
-        return user;
-
-    }
+	}
 }

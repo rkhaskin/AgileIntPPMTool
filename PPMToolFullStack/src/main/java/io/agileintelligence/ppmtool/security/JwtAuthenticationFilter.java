@@ -19,52 +19,59 @@ import java.util.Collections;
 import static io.agileintelligence.ppmtool.security.SecurityConstants.HEADER_STRING;
 import static io.agileintelligence.ppmtool.security.SecurityConstants.TOKEN_PREFIX;
 
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter
+{
 
-    @Autowired
-    private JwtTokenProvider tokenProvider;
+	@Autowired
+	private JwtTokenProvider tokenProvider;
 
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
+	@Autowired
+	private CustomUserDetailsService customUserDetailsService;
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
-                                    FilterChain filterChain) throws ServletException, IOException {
+	@Override
+	protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
+			FilterChain filterChain) throws ServletException, IOException
+	{
 
-        try {
+		try
+		{
 
-            String jwt = getJWTFromRequest(httpServletRequest);
+			String jwt = getJWTFromRequest(httpServletRequest);
 
-            if(StringUtils.hasText(jwt)&& tokenProvider.validateToken(jwt)){
-                Long userId = tokenProvider.getUserIdFromJWT(jwt);
-                User userDetails = customUserDetailsService.loadUserById(userId);
+			// if Authentication header is present, get token out of it, get userId from the token,
+			// call db and retrieve the user
+			if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt))
+			{
+				Long userId = tokenProvider.getUserIdFromJWT(jwt);
+				User userDetails = customUserDetailsService.loadUserById(userId);
 
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, Collections.emptyList());
+				// set up the authentication
+				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+						userDetails, null, Collections.emptyList());
 
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
+				SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            }
+			}
 
-        }catch (Exception ex){
-            logger.error("Could not set user authentication in security context", ex);
-        }
+		} catch (Exception ex)
+		{
+			logger.error("Could not set user authentication in security context", ex);
+		}
 
+		filterChain.doFilter(httpServletRequest, httpServletResponse);
 
-        filterChain.doFilter(httpServletRequest, httpServletResponse);
+	}
 
-    }
+	private String getJWTFromRequest(HttpServletRequest request)
+	{
+		String bearerToken = request.getHeader(HEADER_STRING);
 
+		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(TOKEN_PREFIX))
+		{
+			return bearerToken.substring(7, bearerToken.length());
+		}
 
-
-    private String getJWTFromRequest(HttpServletRequest request){
-        String bearerToken = request.getHeader(HEADER_STRING);
-
-        if(StringUtils.hasText(bearerToken)&&bearerToken.startsWith(TOKEN_PREFIX)){
-            return bearerToken.substring(7, bearerToken.length());
-        }
-
-        return null;
-    }
+		return null;
+	}
 }

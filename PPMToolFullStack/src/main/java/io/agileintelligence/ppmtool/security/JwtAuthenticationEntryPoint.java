@@ -11,21 +11,26 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/*
+ * The purpose of this class is to create a custom message that will be sent to the client un case the authentication failed.
+ */
+
 @Component
-public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint
+{
 
-    @Override
-    public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
-                         AuthenticationException e) throws IOException, ServletException {
+	@Override
+	public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
+			AuthenticationException e) throws IOException, ServletException
+	{
 
-        InvalidLoginResponse loginResponse = new InvalidLoginResponse();
-        String jsonLoginResponse = new Gson().toJson(loginResponse);
+		InvalidLoginResponse loginResponse = new InvalidLoginResponse();
+		// convert object to json
+		String jsonLoginResponse = new Gson().toJson(loginResponse);
 
+		httpServletResponse.setContentType("application/json");
+		httpServletResponse.setStatus(401);
+		httpServletResponse.getWriter().print(jsonLoginResponse);
 
-        httpServletResponse.setContentType("application/json");
-        httpServletResponse.setStatus(401);
-        httpServletResponse.getWriter().print(jsonLoginResponse);
-
-
-    }
+	}
 }

@@ -20,61 +20,73 @@ import static io.agileintelligence.ppmtool.security.SecurityConstants.SIGN_UP_UR
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(
-        securedEnabled = true,
-        jsr250Enabled = true,
-        prePostEnabled = true
-)
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+@EnableGlobalMethodSecurity(securedEnabled = true, // this setting allows to set method-based security. It will be based
+													// on the roles...
+		jsr250Enabled = true, prePostEnabled = true)
+public class SecurityConfig extends WebSecurityConfigurerAdapter
+{
 
-    @Autowired
-    private JwtAuthenticationEntryPoint unauthorizedHandler;
+	@Autowired
+	private JwtAuthenticationEntryPoint unauthorizedHandler;
 
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
+	@Autowired
+	private CustomUserDetailsService customUserDetailsService;
 
-    @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() {return  new JwtAuthenticationFilter();}
+	@Bean
+	public JwtAuthenticationFilter jwtAuthenticationFilter()
+	{
+		return new JwtAuthenticationFilter();
+	}
 
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+	@Autowired
+	private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-        authenticationManagerBuilder.userDetailsService(customUserDetailsService).passwordEncoder(bCryptPasswordEncoder);
-    }
+	@Override
+	protected void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception
+	{
+		authenticationManagerBuilder.userDetailsService(customUserDetailsService)
+				.passwordEncoder(bCryptPasswordEncoder);
+	}
 
-    @Override
-    @Bean(BeanIds.AUTHENTICATION_MANAGER)
-    protected AuthenticationManager authenticationManager() throws Exception {
-        return super.authenticationManager();
-    }
+	@Override
+	@Bean(BeanIds.AUTHENTICATION_MANAGER)
+	protected AuthenticationManager authenticationManager() throws Exception
+	{
+		return super.authenticationManager();
+	}
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.cors().and().csrf().disable()
-                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .headers().frameOptions().sameOrigin() //To enable H2 Database
-                .and()
-                .authorizeRequests()
-                .antMatchers(
-                        "/",
-                        "/favicon.ico",
-                        "/**/*.png",
-                        "/**/*.gif",
-                        "/**/*.svg",
-                        "/**/*.jpg",
-                        "/**/*.html",
-                        "/**/*.css",
-                        "/**/*.js"
-                ).permitAll()
-                .antMatchers(SIGN_UP_URLS).permitAll()
-                .antMatchers(H2_URL).permitAll()
-                .anyRequest().authenticated();
-
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.springframework.security.config.annotation.web.configuration.
+	 * WebSecurityConfigurerAdapter#configure(org.springframework.security.config.
+	 * annotation.web.builders.HttpSecurity) overrides a default implementation of
+	 * HttpSecurity. As we have apis here, this is how we secure them
+	 */
+	@Override
+	protected void configure(HttpSecurity http) throws Exception
+	{
+		http.cors().and().csrf().disable() // these two are about attacks (cross-site and cross-origin resourse sharing
+											// as we are using jwt and it will prevent both)
+				.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and() // show a custom error message
+																							// instead of a default 401
+																							// response when login is not successful.
+				                                                                            // For example, when trying to login with
+																							// bad username
+				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // do not save sessions or
+																							// cookies. All done with
+																							// tokens
+				.and().headers().frameOptions().sameOrigin() // To enable H2 Database
+				.and().authorizeRequests()
+				.antMatchers("/", "/favicon.ico", "/**/*.png", "/**/*.gif", "/**/*.svg", "/**/*.jpg", "/**/*.html",
+						"/**/*.css", "/**/*.js")
+				.permitAll() // permit all of these requests. Do not use security for clients like Thymeleaf,
+								// Spring MVC, JSP, etc.
+				.antMatchers(SIGN_UP_URLS).permitAll() // allow new users to register or see the login screen
+				.antMatchers(H2_URL).permitAll()
+				.anyRequest().authenticated(); // anything other than above needs
+																				// authentication
+        // run jwtAuthenticationFilter for all other requests.
+		http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+	}
 }
