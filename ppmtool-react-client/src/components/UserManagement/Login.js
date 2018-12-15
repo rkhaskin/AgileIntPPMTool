@@ -17,12 +17,14 @@ class Login extends Component {
   }
 
   componentDidMount() {
+    console.log("aaa");
     if (this.props.security.validToken) {
       this.props.history.push("/dashboard");
     }
   }
 
   componentWillReceiveProps(nextProps) {
+    console.log("bbbb " + nextProps.security.validToken);
     if (nextProps.security.validToken) {
       this.props.history.push("/dashboard");
     }

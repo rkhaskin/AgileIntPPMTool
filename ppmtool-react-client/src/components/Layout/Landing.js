@@ -5,6 +5,7 @@ import PropTypes from "prop-types";
 
 class Landing extends Component {
   componentDidMount() {
+    console.log("landing");
     if (this.props.security.validToken) {
       this.props.history.push("/dashboard");
     }
