@@ -58,26 +58,11 @@ class App extends Component {
             <Switch>
               <SecuredRoute exact path="/dashboard" component={Dashboard} />
               <SecuredRoute exact path="/addProject" component={AddProject} />
-              <SecuredRoute
-                exact
-                path="/updateProject/:id"
-                component={UpdateProject}
+              <SecuredRoute exact path="/updateProject/:id" component={UpdateProject}
               />
-              <SecuredRoute
-                exact
-                path="/projectBoard/:id"
-                component={ProjectBoard}
-              />
-              <SecuredRoute
-                exact
-                path="/addProjectTask/:id"
-                component={AddProjectTask}
-              />
-              <SecuredRoute
-                exact
-                path="/updateProjectTask/:backlog_id/:pt_id"
-                component={UpdateProjectTask}
-              />
+              <SecuredRoute exact path="/projectBoard/:id" component={ProjectBoard} />
+              <SecuredRoute exact path="/addProjectTask/:id" component={AddProjectTask} />
+              <SecuredRoute exact path="/updateProjectTask/:backlog_id/:pt_id" component={UpdateProjectTask} />
             </Switch>
           </div>
         </Router>
