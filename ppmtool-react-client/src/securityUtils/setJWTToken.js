@@ -1,10 +1,10 @@
-import axios from "axios";
+import axiosAPI from "../utils/axios-api";
 
 const setJWTToken = token => {
   if (token) {
-    axios.defaults.headers.common["Authorization"] = token;
+    axiosAPI.defaults.headers.common["Authorization"] = token;
   } else {
-    delete axios.defaults.headers.common["Authorization"];
+    delete axiosAPI.defaults.headers.common["Authorization"];
   }
 };
 
