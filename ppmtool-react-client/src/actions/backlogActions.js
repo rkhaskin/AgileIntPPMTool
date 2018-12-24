@@ -1,4 +1,4 @@
-import axiosAPI from "../utils/axios-api";
+import axiosAPI from "axios";
 import {
   GET_ERRORS,
   GET_BACKLOG,

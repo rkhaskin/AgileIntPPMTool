@@ -1,5 +1,5 @@
 //import axios from "axios";
-import axiosAPI from "../utils/axios-api";
+import axiosAPI from "axios";
 
 import { GET_ERRORS, SET_CURRENT_USER } from "./types";
 import setJWTToken from "../securityUtils/setJWTToken";
